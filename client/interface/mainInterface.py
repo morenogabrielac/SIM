@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QFormLayout, QLineEdit, QSizePolicy
-from src.widgets.datosRnd import generar_datos_aleatorios
+from src.widgets.generadorDatos import generar_datos_Distribucion
 from src.widgets.tabla1 import Tabla1
 
 
@@ -12,9 +12,11 @@ class InterfazGrafica(QWidget):
 
 
         # Crear la tabla 1
+        #IMPORTANTE: tenemos que crear 
+        mis_datos = {"media": 1,"desviacion":0,"lambda":5,"limiteSuperior":20,"limiteInferior":0}
         #generate en el arreglo con los datos generados aleatoriamente
-        datos,distribucion = generar_datos_aleatorios(50000)
-        self.tabla1 = Tabla1(datos,distribucion)
+        datos_distribucion = generar_datos_Distribucion(50000,2,mis_datos)
+        self.tabla1 = Tabla1(datos_distribucion)
         # Modificar el tamaño del contenedor de Tabla1
         self.tabla1.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.tabla1.setFixedWidth(350)

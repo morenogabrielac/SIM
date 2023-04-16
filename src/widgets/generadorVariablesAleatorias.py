@@ -32,7 +32,13 @@ def distribucionNormal(m,v):
     rnd2 = random.random()
     x1 = (math.sqrt(-2 * math.log(rnd1)) * math.cos(2 * pi * rnd2))*m + v
     x2 = (math.sqrt(-2 * math.log(rnd1)) * math.sin(2 * pi * rnd2))*m + v
-    return x1,x2
+    aleatorio = random.random()
+    if(aleatorio > 0,4999):
+        resultado = x1
+    else:
+        resultado = x2
+    
+    return resultado
 
 #Distribucion de Poisson
 #b = lambda, lambda es la media
