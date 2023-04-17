@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 
-class Tabla1(QTableWidget):
+class TablaGeneral(QTableWidget):
     def __init__(self, datos):
         super().__init__()
         
