@@ -14,7 +14,7 @@ class InterfazGrafica(QWidget):
         #IMPORTANTE: tenemos que crear 
         mis_datos = {"muestra":50000,"media": 1,"desviacion":0,"lambda":5,"limiteSuperior":20,"limiteInferior":0}
         #generate en el arreglo con los datos generados aleatoriamente
-        datos_distribucion = generar_datos_Distribucion(50000,2,mis_datos)
+        datos_distribucion = generar_datos_Distribucion(2,mis_datos)
         tablaGeneral = TablaGeneral(datos_distribucion)
         # Modificar el tamaño del contenedor de TablaGeneral
         tablaGeneral.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)

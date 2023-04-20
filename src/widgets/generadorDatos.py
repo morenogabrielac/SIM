@@ -23,11 +23,11 @@ def generar_datos_Distribucion(Distribution, datosDistribucion):
     if(Distribution==1):
         datos_aleatorios = [round(distribucionPoisson(1/(datosDistribucion["media"])), 4) for _ in range(datosDistribucion["muestra"])]
     elif(Distribution==2):
-        datos_aleatorios = [round(distribucionUniforme(datosDistribucion["limiteInferior"],datosDistribucion["limiteSuperior"]), 4) for _ in range(n)]
+        datos_aleatorios = [round(distribucionUniforme(datosDistribucion["limiteInferior"],datosDistribucion["limiteSuperior"]), 4) for _ in range(datosDistribucion["muestra"])]
     elif(Distribution==3):
-        datos_aleatorios = [round(distribucionNormal(datosDistribucion["media"],datosDistribucion["varianza"]) , 4) for _ in range(n)]
+        datos_aleatorios = [round(distribucionNormal(datosDistribucion["media"],datosDistribucion["varianza"]) , 4) for _ in range(datosDistribucion["muestra"])]
     elif(Distribution==4):
-        datos_aleatorios = [round(distribucionExpNegativa(datosDistribucion("media")), 4) for _ in range(n)]
+        datos_aleatorios = [round(distribucionExpNegativa(datosDistribucion("media")), 4) for _ in range(datosDistribucion["muestra"])]
 
         
         
