@@ -30,8 +30,9 @@ def distribucionNormal(m,v):
     pi = math.pi
     rnd1 = random.random()
     rnd2 = random.random()
-    x1 = (math.sqrt(-2 * math.log(rnd1)) * math.cos(2 * pi * rnd2))*m + v
-    x2 = (math.sqrt(-2 * math.log(rnd1)) * math.sin(2 * pi * rnd2))*m + v
+    desviacion = math.sqrt(v)
+    x1 = (math.sqrt(-2 * math.log(rnd1)) * math.cos(2 * pi * rnd2))*desviacion + m
+    x2 = (math.sqrt(-2 * math.log(rnd1)) * math.sin(2 * pi * rnd2))*desviacion + m
     aleatorio = random.random()
     if(aleatorio > 0,4999):
         resultado = x1

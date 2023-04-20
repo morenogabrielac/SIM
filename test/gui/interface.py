@@ -1,27 +1,27 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QFormLayout, QLineEdit, QSizePolicy
-from src.widgets.generadorDatos import generar_datos_Distribucion
-from client.interface.tablaDatosPrincipal import TablaGeneral
-
+from tabla1 import Tabla1
+from datosRnd import generar_datos_aleatorios as generate
+from config_ui import init_ui
 
 class InterfazGrafica(QWidget):
     def __init__(self):
         super().__init__()
         
+        init_ui(self)
 
-        #Desv Standar es raiz cuadrada varianza
+
+
         # Crear la tabla 1
-        #IMPORTANTE: tenemos que crear 
-        mis_datos = {"muestra":50000,"media": 1,"desviacion":0,"lambda":5,"limiteSuperior":20,"limiteInferior":0}
         #generate en el arreglo con los datos generados aleatoriamente
-        datos_distribucion = generar_datos_Distribucion(50000,2,mis_datos)
-        tablaGeneral = TablaGeneral(datos_distribucion)
-        # Modificar el tamaño del contenedor de TablaGeneral
-        tablaGeneral.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        tablaGeneral.setFixedWidth(350)
+        datos,distribucion = generate(50000)
+        self.tabla1 = Tabla1(datos,distribucion)
+        # Modificar el tamaño del contenedor de Tabla1
+        self.tabla1.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.tabla1.setFixedWidth(350)
 
 
-        
+
         # Crear la tabla 2
         self.tabla2 = QTableWidget()
         self.tabla2.setColumnCount(4)
@@ -38,7 +38,7 @@ class InterfazGrafica(QWidget):
 
         # Crear diseño vertical para la ventana
         layout = QVBoxLayout()
-        layout.addWidget(tablaGeneral)
+        layout.addWidget(self.tabla1)
         layout.addWidget(self.tabla2)        
         layout.addLayout(self.formulario)
 

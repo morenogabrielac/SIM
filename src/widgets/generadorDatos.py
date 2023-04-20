@@ -1,7 +1,7 @@
 from src.widgets.generadorVariablesAleatorias import *
 
 
-def generar_datos_Distribucion(n, Distribution, datosDistribucion):
+def generar_datos_Distribucion(Distribution, datosDistribucion):
     """
     Función que genera 'n' datos aleatorios entre 0 y 1, y luego genera 'n' datos de distribución uniforme
     utilizando los mismos datos aleatorios generados.
@@ -12,7 +12,7 @@ def generar_datos_Distribucion(n, Distribution, datosDistribucion):
         Distribution: Tipo de distribucion seleccionanda entre las siguientes [1:Poisson,2:Uniforme,3:Normal,4:Exponencial]
         
         datosDistribucion: aca van a ir los datos que correspondan a las diferentes distribuciones usando el siguiente diccionario
-            {"media": 1,"desviacion":0,"lambda":5,"limiteSuperior":20,"limiteInferior":0}
+            {"muestra":444,"media": 1,"desviacion":0,"lambda":5,"limiteSuperior":20,"limiteInferior":0}
 
     Returns:
         tuple: Tupla con dos arrays, el primero contiene los datos aleatorios y el segundo contiene los datos
@@ -21,7 +21,7 @@ def generar_datos_Distribucion(n, Distribution, datosDistribucion):
     #valor de truncado
     
     if(Distribution==1):
-        datos_aleatorios = [round(distribucionPoisson(1/(datosDistribucion["media"])), 4) for _ in range(n)]
+        datos_aleatorios = [round(distribucionPoisson(1/(datosDistribucion["media"])), 4) for _ in range(datosDistribucion["muestra"])]
     elif(Distribution==2):
         datos_aleatorios = [round(distribucionUniforme(datosDistribucion["limiteInferior"],datosDistribucion["limiteSuperior"]), 4) for _ in range(n)]
     elif(Distribution==3):
