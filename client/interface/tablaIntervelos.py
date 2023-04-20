@@ -17,5 +17,5 @@ class TablaIntervalos(QTableWidget):
         
         
         #    
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.setFixedWidth(150)
+       # self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+       # self.setFixedWidth(150)

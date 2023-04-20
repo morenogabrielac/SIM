@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QApplication
-from client.interface.mainInterface import InterfazGrafica as UI
+from client.interface.mainInterface import InterfazGrafica 
 import sys
 
 # Función para ejecutar la aplicación
 def run_app():
     app = QApplication(sys.argv)
-    ventana = UI()
+    ventana = InterfazGrafica()
     ventana.show()
     sys.exit(app.exec_())
 
