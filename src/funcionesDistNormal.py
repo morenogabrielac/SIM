@@ -1,5 +1,5 @@
 
-
+import decimal
 from cmath import exp, pi
 from logging import root
 import math
@@ -46,6 +46,8 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
         else:
             vectorIntervalosInicioFin[i] = vectorIntervalosInicioFin[i - 2] + anchoIntervalos
             continue
+        
+    vectorIIF_BASE = vectorIntervalosInicioFin
 
     #Creamos el vector que va a tener las marcas de clase de cada intervalo
     vectorMarcasDeClase = [0] * cantidadIntervalos
@@ -69,7 +71,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
             else:
                 subindice3 += 2
                 subindice4 += 1
-    vectorFOInicial = vectorFrecuenciaObservada
+    vectorFO_BASE = vectorFrecuenciaObservada
     #Calculamos la distribucion de densidad y la frecuencia esperada para cada intervalo
     vectorDistribucionDensidad = [0] * cantidadIntervalos
     vectorFrecuenciaEsperada = [0] * cantidadIntervalos
@@ -81,7 +83,8 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
         vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
         subindice5 += 2
         acumuladorPo += vectorDistribucionDensidad[i]
-
+    vectorFE_BASE = vectorFrecuenciaEsperada    
+    
     #En este loop, lo que hacemos es agrupar con los intervalos adyacentes, aquellos intervalos que tengan una frecuencia esperada menos a 5
     for i in range(len(vectorFrecuenciaEsperada)):
         if(vectorFrecuenciaEsperada[i] < 5):
@@ -135,14 +138,29 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
         
 
     #Esta funcion retorna de forma secuencial lo siguiente:
-    #   vectorIntervalosInicioFin: Este vector ya esta modificado para la forma de chi cuadrado, es decir que muchos de los intervalos se agruparon con su adyacente, por lo cual, todas las celdas que esten en 0 son limites de intervalos que fueron eliminados para formar los nuevos intervalos mas grandes
-    #   vectorIntervalosInicioFin: AL igual que el anterior, este vector ya esta modificado para la forma de chi cuadrado, por lo cual algunas de las celdas son 0, siendo estas las pertenecientes a los antiguos intervalos que no superaban una distribucion de densidad mayor o igual a 5
+    #   vectorIntervalosInicioFin: Este vector ya esta modificado para la forma de chi cuadrado,
+    # es decir que muchos de los intervalos se agruparon con su adyacente, por lo cual, todas las celdas que esten en 0 son limites
+    # de intervalos que fueron eliminados para formar los nuevos intervalos mas grandes
+    #   vectorIntervalosInicioFin: AL igual que el anterior, este vector ya esta modificado para la forma de chi cuadrado, 
+    # por lo cual algunas de las celdas son 0, siendo estas las pertenecientes a los antiguos intervalos que no superaban una 
+    # distribucion de densidad mayor o igual a 5
     #   vectorFrecuenciaObservada:Exactamente igual que los dos anteriores
     #   vectorFrecuenciaEsperada:Igual a los anteriores
-    #   vectorCChiCuadrado:Este vector contiene los valores de c para cada intervalo, los que son 0 son para los intervalos que ya no existen, por lo tanto, no tienen significado
+    #   vectorCChiCuadrado:Este vector contiene los valores de c para cada intervalo, los que son 0 son para los intervalos que 
+    # ya no existen, por lo tanto, no tienen significado
     #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
     #   gradosLibertad:Grados de libertad que tenemos
-    return vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,vectorFOInicial,acumuladorCChiCuadrado,gradosLibertad
+    vectorMarcasDeClase = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorMarcasDeClase))
+    vectorIntervalosInicioFin = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIntervalosInicioFin))
+    vectorIIF_BASE = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIIF_BASE))
+    vectorDistribucionDensidad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorDistribucionDensidad))
+    vectorFrecuenciaObservada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaObservada))
+    vectorFrecuenciaEsperada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaEsperada))
+    vectorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorCChiCuadrado))
+    vectorFE_BASE = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFE_BASE))
+    vectorFO_BASE = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.1'), rounding=decimal.ROUND_DOWN), vectorFO_BASE))
+    #acumuladorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN), acumuladorCChiCuadrado))
+    return vectorMarcasDeClase,vectorIntervalosInicioFin,vectorIIF_BASE, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,vectorFE_BASE,vectorFO_BASE,acumuladorCChiCuadrado,gradosLibertad
     
     
 

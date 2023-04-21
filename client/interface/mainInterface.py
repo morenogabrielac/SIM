@@ -5,17 +5,9 @@ from src.widgets.generadorDatos import generar_datos_Distribucion
 #from client.interface.components.formDatos import  Formulario
 from client.interface.tablaIntervelos import TablaIntervalos
 from client.interface.tablaDatosPrincipal import TablaGeneral
-#from interface.components.tablaChi import TablaChiCuadrado
-datos = {
-            'Numero de muestra': 0,
-            'Varianza': 0,
-            'Media': 0,
-            'Desviacion Estandar': 0,
-            'Lambda': 0,
-            'Intervalo Superior': 0,
-            'Intervalo Inferior': 0,
-            'Cantidad intervalos': 0
-        }
+from client.interface.tablaChi import TablaChiCuadrado
+from src.funcionesDistNormal import *
+from client.interface.grafico import RandomDataHistogram as Grafico
 
 class InterfazGrafica(QWidget):
     def __init__(self):
@@ -105,8 +97,8 @@ class Formulario_Normal(QWidget):
         self.de_edit.setRange(-1000, 1000)
         self.cant_intervalo_edit = QLineEdit()
 
-        self.guardar_btn = QPushButton('Generar')
-        self.guardar_btn.clicked.connect(self.guardar_datos)        
+        self.guardar_btn = QPushButton('Generar')    
+         
         self.guardar_btn.clicked.connect(self.open_window_normal_stats)
 
         # Crear el layout
@@ -123,7 +115,9 @@ class Formulario_Normal(QWidget):
 
         self.setLayout(layout)
         
-    def guardar_datos(self):
+   
+       
+    def open_window_normal_stats(self):
         n = int(self.num_muestra_edit.text())
         media = float(self.media_edit.value())
         desvE = float(self.de_edit.value())
@@ -139,51 +133,51 @@ class Formulario_Normal(QWidget):
             'Intervalo Inferior': 0,
             'Cantidad intervalos': cantIntervalos
         }
-        
-        print(datos)
-        
-    def open_window_normal_stats(self):
        
-        self.new_window = Graficos_Normal()
+        self.new_window = Graficos_Normal(datos)
         self.new_window.show()    
   
         
 #----------------------------------------------Graficos de distribucion NORMAL----------------------------------------------    
     
 class Graficos_Normal(QWidget):
-    def __init__(self):
+    def __init__(self,datosEntrantes):
         super().__init__()
         self.setWindowTitle('Formulario')
         self.setGeometry(100, 100, 400, 300)
 
+        datosGenerados = generar_datos_Distribucion(3,datosEntrantes)
+        vectorMC,vectorIntervalosInicioFin,vectorIIF_BASE, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,vectorFE_BASE,vectorFO_BASE,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        intervalo = int(len(vectorIIF_BASE)/2)
+        
         # Crear los widgets
-        self.tablaAleadorios = TablaIntervalos()
+        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
 
-        self.guardar_btn = QPushButton('Generar')    
-                # Crear el layout
+        tablaGeneral = TablaGeneral(datosGenerados)
+        graficoNormal = Grafico(intervalo)
+        tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
+        
+
+         
+        # Crear el layout
         layout = QHBoxLayout()
-        layout.addWidget(self.tablaAleadorios)
-        layout.addWidget(self.guardar_btn)
+        layoutTablas = QVBoxLayout()
+        layoutGrafico = QVBoxLayout()
+        layout.addWidget(tablaGeneral)
+        layoutTablas.addWidget(tablaAleadorios)
+        layoutTablas.addWidget(tablaChi)
+        layoutGrafico.addWidget(graficoNormal)
+        
+        
+        #layoutTablas.addWidget(tablaChi)
+        layout.addLayout(layoutTablas)
+        layout.addLayout(layoutGrafico)
+        
 
 
         self.setLayout(layout)
         
-"""        def __init__(self):
-            super().__init__()
-            self.setWindowTitle('Formulario')
-            self.setGeometry(100, 100, 400, 300)
-            datosGenerados = generar_datos_Distribucion(3,datos)
-            
-            layout_main = QHBoxLayout()
-            tablaAleatoria = Tabla1(datosGenerados)
-            #tablaGeneral = TablaIntervalos()
-            tablaChi = TablaChiCuadrado()
-            
-            layout_main.addWidget(tablaAleatoria)
-            #layout_main.addWidget(tablaGeneral)
-            #layout_main.addWidget(tablaChi)
-            
-            self.setLayout(layout_main)"""
+
 
         
 
@@ -211,6 +205,7 @@ class Formulario_Uniforme(QWidget):
 
         self.guardar_btn = QPushButton('Generar')
         self.guardar_btn.clicked.connect(self.guardar_datos)
+       
 
         # Crear el layout
         layout = QGridLayout()
@@ -225,6 +220,8 @@ class Formulario_Uniforme(QWidget):
         layout.addWidget(self.guardar_btn, 5, 0, 1, 2)
 
         self.setLayout(layout)
+        
+        
     def guardar_datos(self):
         n = int(self.num_muestra_edit.text())
         a = int(self.intervalo_inferior_edit.text())

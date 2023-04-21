@@ -24,13 +24,13 @@ def distribucionExpNegativa(m):
 
 #Distribucion normal
 #Usa el metodo de Box-Muller
-#m = media, v = varianza
+#m = media, desviacion
 
-def distribucionNormal(m,v):
+def distribucionNormal(m,desviacion):
     pi = math.pi
     rnd1 = random.random()
     rnd2 = random.random()
-    desviacion = math.sqrt(v)
+    desviacion = math.sqrt(desviacion)
     x1 = (math.sqrt(-2 * math.log(rnd1)) * math.cos(2 * pi * rnd2))*desviacion + m
     x2 = (math.sqrt(-2 * math.log(rnd1)) * math.sin(2 * pi * rnd2))*desviacion + m
     aleatorio = random.random()
@@ -42,7 +42,7 @@ def distribucionNormal(m,v):
     return resultado
 
 #Distribucion de Poisson
-#b = lambda, lambda es la media
+#b = lambda
 
 def distribucionPoisson(b):
     p = 1
