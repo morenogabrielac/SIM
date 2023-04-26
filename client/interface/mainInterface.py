@@ -7,7 +7,15 @@ from client.interface.tablaIntervelos import TablaIntervalos
 from client.interface.tablaDatosPrincipal import TablaGeneral
 from client.interface.tablaChi import TablaChiCuadrado
 from src.funcionesDistNormal import *
+from src.funcionesDistExponencial import distribucion_Densidad as exponencial
+from src.funcionesDistExponencial import distribucion_DensidadBase as exponencialBase
+from src.funcionesDistUniforme import distribucion_Densidad as uniforme
+from src.funcionesDistUniforme import distribucion_DensidadBase as uniformeBase
+from src.funcionesDistPoisson import distribucion_Densidad as poisson
+from src.funcionesDistPoisson import distribucion_DensidadBase as poissonBase
+
 from client.interface.grafico import RandomDataHistogram as Grafico
+from src.widgets.generadorVariablesAleatorias import prueba_chi
 
 class InterfazGrafica(QWidget):
     def __init__(self):
@@ -143,35 +151,43 @@ class Formulario_Normal(QWidget):
 class Graficos_Normal(QWidget):
     def __init__(self,datosEntrantes):
         super().__init__()
-        self.setWindowTitle('Formulario')
+        self.setWindowTitle('Distribucion Normal')
         self.setGeometry(100, 100, 400, 300)
 
         datosGenerados = generar_datos_Distribucion(3,datosEntrantes)
-        vectorMC,vectorIntervalosInicioFin,vectorIIF_BASE, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,vectorFE_BASE,vectorFO_BASE,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        vectorMC,vectorIIF_BASE,vectorDistribucionDensidad,vectorFO_BASE,vectorFE_BASE = distribucion_DensidadBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        vectorIntervalosInicioFin,vectorDensidad,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=distribucion_Densidad(datosGenerados,datosEntrantes['Cantidad intervalos'])
         intervalo = int(len(vectorIIF_BASE)/2)
         
         # Crear los widgets
         tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
 
         tablaGeneral = TablaGeneral(datosGenerados)
-        graficoNormal = Grafico(intervalo)
+        graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
         tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
-        
+        pruebaChi = prueba_chi(3,intervalo,acumuladorCChiCuadrado)
+                # Crear los widgets
+        pruebaChi_label = QLabel(pruebaChi)
 
          
         # Crear el layout
+        layout_texto = QGridLayout()
         layout = QHBoxLayout()
         layoutTablas = QVBoxLayout()
-        layoutGrafico = QVBoxLayout()
+        layoutGrafico = QVBoxLayout()        
         layout.addWidget(tablaGeneral)
         layoutTablas.addWidget(tablaAleadorios)
         layoutTablas.addWidget(tablaChi)
+        layoutTablas.addLayout(layout_texto)
         layoutGrafico.addWidget(graficoNormal)
+        layout_texto.addWidget(pruebaChi_label, 0, 0)
+        
         
         
         #layoutTablas.addWidget(tablaChi)
         layout.addLayout(layoutTablas)
         layout.addLayout(layoutGrafico)
+    
         
 
 
@@ -204,7 +220,7 @@ class Formulario_Uniforme(QWidget):
         self.cant_intervalo_edit = QLineEdit()
 
         self.guardar_btn = QPushButton('Generar')
-        self.guardar_btn.clicked.connect(self.guardar_datos)
+        self.guardar_btn.clicked.connect(self.open_window_uniforme_stats)
        
 
         # Crear el layout
@@ -222,7 +238,8 @@ class Formulario_Uniforme(QWidget):
         self.setLayout(layout)
         
         
-    def guardar_datos(self):
+    
+    def open_window_uniforme_stats(self):
         n = int(self.num_muestra_edit.text())
         a = int(self.intervalo_inferior_edit.text())
         b = int(self.intervalo_superior_edit.text())
@@ -239,8 +256,65 @@ class Formulario_Uniforme(QWidget):
             'Cantidad intervalos': cantIntervalos
         }
         print(datos)
+        self.new_window = Graficos_Uniforme(datos)
+        self.new_window.show()    
 
 #----------------------------------------------Grafico de distribucion UNIFORME-------------------------------------------------
+class Graficos_Uniforme(QWidget):
+    def __init__(self,datosEntrantes):
+        super().__init__()
+        self.setWindowTitle('Distribucion uniforme')
+        self.setGeometry(100, 100, 400, 300)
+
+        datosGenerados = generar_datos_Distribucion(2,datosEntrantes)
+        vectorMC,vectorIIF_BASE,vectorFO_BASE,vectorFE_BASE,vectorDistribucionDensidad = uniformeBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=uniforme(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        intervalo = int(len(vectorIIF_BASE)/2)
+        
+        # Crear los widgets
+        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
+
+        tablaGeneral = TablaGeneral(datosGenerados)
+        graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
+        tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
+        pruebaChi = prueba_chi(3,intervalo,acumuladorCChiCuadrado)
+                # Crear los widgets
+        pruebaChi_label = QLabel(pruebaChi)
+
+         
+        # Crear el layout
+        layout_texto = QGridLayout()
+        layout = QHBoxLayout()
+        layoutTablas = QVBoxLayout()
+        layoutGrafico = QVBoxLayout()        
+        layout.addWidget(tablaGeneral)
+        layoutTablas.addWidget(tablaAleadorios)
+        layoutTablas.addWidget(tablaChi)
+        layoutTablas.addLayout(layout_texto)
+        layoutGrafico.addWidget(graficoNormal)
+        layout_texto.addWidget(pruebaChi_label, 0, 0)        
+
+         
+        # Crear el layout
+
+        
+        
+        #layoutTablas.addWidget(tablaChi)
+        layout.addLayout(layoutTablas)
+        layout.addLayout(layoutGrafico)
+    
+        
+
+
+        self.setLayout(layout)
+        
+
+
+        
+
+
+        #self.setLayout()
+        
 
 
 #----------------------------------------------DISTRIBUCION EXPONENCIAL NEGATIVA------------------------------------------------
@@ -252,9 +326,10 @@ class Formulario_Exponencial(QWidget):
         self.setGeometry(100, 100, 400, 300)
 
         # Crear los widgets
+        #cuidado con esto
         self.num_muestra_label = QLabel('Tamaño de muestra:')
-        self.lambda_label = QLabel('Lambda:')
-        self.cant_intervalo_label = QLabel('cantidad Intervalos:')
+        self.lambda_label = QLabel('Lambda')
+        self.cant_intervalo_label = QLabel('Cantidad Intervalos:')
 
         self.num_muestra_edit = QLineEdit()
         self.lambda_edit = QLineEdit()
@@ -275,7 +350,7 @@ class Formulario_Exponencial(QWidget):
 
         self.setLayout(layout)
     def guardar_datos(self):
-        n = float(self.num_muestra_edit.text())
+        n = int(self.num_muestra_edit.text())
         lamb = float(self.lambda_edit.text())
         cantIntervalos =  int(self.cant_intervalo_edit.text())
         
@@ -291,15 +366,60 @@ class Formulario_Exponencial(QWidget):
         }
         print(datos)
 
-#--------------------------------------Grafico de distribucion EXPONENCIAL NEGATIVA--------------------------------------------
+        self.new_window = Graficos_Exponencial(datos)
+        self.new_window.show()
 
+#--------------------------------------Grafico de distribucion EXPONENCIAL NEGATIVA--------------------------------------------
+class Graficos_Exponencial(QWidget):
+    def __init__(self,datosEntrantes):
+        super().__init__()
+        self.setWindowTitle('Distribucion exponencial')
+        self.setGeometry(100, 100, 400, 300)
+
+        datosGenerados =generar_datos_Distribucion(4,datosEntrantes)
+        vectorMC,vector1,vectorIIF_BASE,vectorDistribucionDensidad,vectorFO_BASE,vectorFE_BASE,gradosLibertad = exponencialBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        vectorIntervalosInicioFin,vectorDensidad,vector3,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=exponencial(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        intervalo = int(len(vectorIIF_BASE)/2)
+
+         # Crear los widgets
+        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
+
+        tablaGeneral = TablaGeneral(datosGenerados)
+        graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
+        tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
+        pruebaChi = prueba_chi(3,intervalo,acumuladorCChiCuadrado)
+                # Crear los widgets
+        pruebaChi_label = QLabel(pruebaChi)
+
+         
+        # Crear el layout
+        layout_texto = QGridLayout()
+        layout = QHBoxLayout()
+        layoutTablas = QVBoxLayout()
+        layoutGrafico = QVBoxLayout()        
+        layout.addWidget(tablaGeneral)
+        layoutTablas.addWidget(tablaAleadorios)
+        layoutTablas.addWidget(tablaChi)
+        layoutTablas.addLayout(layout_texto)
+        layoutGrafico.addWidget(graficoNormal)
+        layout_texto.addWidget(pruebaChi_label, 0, 0)
+        
+        #layoutTablas.addWidget(tablaChi)
+        layout.addLayout(layoutTablas)
+        layout.addLayout(layoutGrafico)
+    
+        
+
+
+        self.setLayout(layout)
+        
 
 #----------------------------------------------------DISTRIBUCION POISSON--------------------------------------------------------    
 #----------------------------------------------Interfaz de distribucion POISSON--------------------------------------------------    
 class Formulario_Poisson(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Formulario')
+        self.setWindowTitle('Distribucion Poisson')
         self.setGeometry(100, 100, 400, 300)
 
         self.num_muestra_label = QLabel('Tamaño de muestra:')
@@ -340,9 +460,63 @@ class Formulario_Poisson(QWidget):
             'Cantidad intervalos': cantIntervalos
         }
         print(datos)
+        self.new_window = Graficos_Exponencial(datos)
+        self.new_window.show()
+
 
 #----------------------------------------------Grafico de distribucion POISSON--------------------------------------------------
+class Graficos_Poisson(QWidget):
+    def __init__(self,datosEntrantes):
+        super().__init__()
+        self.setWindowTitle('Distribucion Poisson')
+        self.setGeometry(100, 100, 400, 300)
 
+        datosGenerados = generar_datos_Distribucion(1,datosEntrantes)
+        vectorMC,vectorDistribucionDensidad,vectorIIF_BASE,vectorFO_BASE,vectorFE_BASE = poissonBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=poisson(datosGenerados,datosEntrantes['Cantidad intervalos'])
+        intervalo = int(len(vectorIIF_BASE)/2)
+        
+        # Crear los widgets
+        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
+
+        tablaGeneral = TablaGeneral(datosGenerados)
+        graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
+        tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
+        pruebaChi = prueba_chi(3,intervalo,acumuladorCChiCuadrado)
+                # Crear los widgets
+        pruebaChi_label = QLabel(pruebaChi)
+
+         
+        # Crear el layout
+        layout_texto = QGridLayout()
+        layout = QHBoxLayout()
+        layoutTablas = QVBoxLayout()
+        layoutGrafico = QVBoxLayout()        
+        layout.addWidget(tablaGeneral)
+        layoutTablas.addWidget(tablaAleadorios)
+        layoutTablas.addWidget(tablaChi)
+        layoutTablas.addLayout(layout_texto)
+        layoutGrafico.addWidget(graficoNormal)
+        layout_texto.addWidget(pruebaChi_label, 0, 0)        
+        
+        #layoutTablas.addWidget(tablaChi)
+        layout.addLayout(layoutTablas)
+        layout.addLayout(layoutGrafico)
+    
+        
+
+
+        self.setLayout(layout)
+        
+
+
+        
+
+
+        #self.setLayout()
+
+
+    
 
 #------------------------------------------------------------------------------------------------------------------------------
 

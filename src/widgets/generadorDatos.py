@@ -41,7 +41,7 @@ def generar_datos_Distribucion(Distribution, datosDistribucion):
     elif(Distribution==3):
         datos_aleatorios = [math.trunc(distribucionNormal(datosDistribucion['Media'],datosDistribucion['Desviacion Estandar'])*10000 )/10000 for _ in range(datosDistribucion["Numero de muestra"])]
     elif(Distribution==4):
-        datos_aleatorios = [math.trunc(distribucionExpNegativa(datosDistribucion('Lambda'))*10000)/10000 for _ in range(datosDistribucion["Numero de muestra"])]
+        datos_aleatorios = [math.trunc(distribucionExpNegativa(datosDistribucion['Lambda'])*10000 )/10000 for _ in range(datosDistribucion["Numero de muestra"])]
 
         
         

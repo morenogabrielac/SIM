@@ -13,23 +13,16 @@ import random
 #   vector1,vector2,vector3,vector4,vector5,numero1,numero2 = distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos)
 #Para mas especificidad, ver el comentario que esta en el return de la funcion, ahi esta explicada cada devolucion
 def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
-    gradosLibertad = cantidadIntervalos - 3
+    gradosLibertad = cantidadIntervalos - 1
     N = len(vectorVariablesAleatorias)
     minimoValor = min(vectorVariablesAleatorias)
     maximoValor = max(vectorVariablesAleatorias)
     diferencia = maximoValor - minimoValor
     anchoIntervalos = (diferencia/cantidadIntervalos) + 0.01
-    acumuladorMedia = 0 
-    #Calculamos la media para la sucesion numerica del vector de variables aleatorias
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorMedia += vectorVariablesAleatorias[i]      
-    media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    frecEsperada = N/cantidadIntervalos
+    while(frecEsperada<5):
+        cantidadIntervalos -= 1
+        frecEsperada = N/cantidadIntervalos
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -49,16 +42,10 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     
     
     
-    #Creamos el vector que va a tener las marcas de clase de cada intervalo
-    vectorMarcasDeClase = [0] * cantidadIntervalos
-    subIndice1 = 0
-    subindice2 = 0
-    while(subindice2 < len(vectorIntervalosInicioFin)):
-        vectorMarcasDeClase[subIndice1] = (vectorIntervalosInicioFin[subindice2 + 1] + vectorIntervalosInicioFin[subindice2])/2
-        subindice2 += 2
-        subIndice1 += 1
+    
     #Creamos el vector que va a contener la frecuencia observada en cada intervalo
     vectorFrecuenciaObservada = [0] * cantidadIntervalos
+    
     subindice3 = 1
     subindice4 = 0
     for i in range(len(vectorVariablesAleatorias)):
@@ -73,52 +60,13 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
                 subindice4 += 1
     
     
-    #Calculamos la distribucion de densidad y la frecuencia esperada para cada intervalo
-    vectorDistribucionDensidad = [0] * cantidadIntervalos
-    vectorFrecuenciaEsperada = [0] * cantidadIntervalos
-    subindice5 = 1
-    acumuladorPo = 0
-    for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
-        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
-        subindice5 += 2
-        acumuladorPo += vectorDistribucionDensidad[i]
+    #frecuencia esperada para cada intervalo
+    
+    vectorFrecuenciaEsperada = [frecEsperada] * cantidadIntervalos
+    
         
     
-    #En este loop, lo que hacemos es agrupar con los intervalos adyacentes, aquellos intervalos que tengan una frecuencia esperada menos a 5
-    for i in range(len(vectorFrecuenciaEsperada)):
-        if(vectorFrecuenciaEsperada[i] < 5):
-            if(i == len(vectorFrecuenciaEsperada) - 1):
-                vectorFrecuenciaEsperada[i - 1] += vectorFrecuenciaEsperada[i]
-                vectorFrecuenciaObservada[i - 1] += vectorFrecuenciaObservada[i]
-                vectorFrecuenciaObservada[i] = 0
-                vectorFrecuenciaEsperada[i] = 0
-                vectorIntervalosInicioFin[(i*2)] = 0
-                vectorIntervalosInicioFin[(i*2)-1] = 0
-                if(vectorFrecuenciaEsperada[i - 1] < 5):
-                    subindice6 = 1
-                    while(vectorFrecuenciaEsperada[i - subindice6] < 5):
-                        vectorFrecuenciaEsperada[(i - subindice6) - 1] += vectorFrecuenciaEsperada[i - subindice6]
-                        vectorFrecuenciaObservada[(i - subindice6) - 1] += vectorFrecuenciaObservada[i - subindice6]
-                        vectorFrecuenciaObservada[(i - subindice6)] = 0
-                        vectorFrecuenciaEsperada[(i - subindice6)] = 0
-                        vectorIntervalosInicioFin[((i - subindice6)*2)] = 0
-                        vectorIntervalosInicioFin[((i - subindice6)*2)-1] = 0
-                        subindice6 += 1
-
-            else:
-                vectorFrecuenciaEsperada[i + 1] += vectorFrecuenciaEsperada[i]
-                vectorFrecuenciaEsperada[i] = 0
-                vectorFrecuenciaObservada[i + 1] += vectorFrecuenciaObservada[i]
-                vectorFrecuenciaObservada[i] = 0
-                
-                if(i==0):
-                    vectorIntervalosInicioFin[1] = 0
-                    vectorIntervalosInicioFin[2] = 0
-                else:
-                    vectorIntervalosInicioFin[(i*2)+1] = 0
-                    vectorIntervalosInicioFin[(i*2)+2] = 0
+    
     
     
     #Aqui calculamos el C de chi cuadrado y el Cac(C acumulado) para cada intervalo
@@ -136,7 +84,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     for i in range(len(vectorFrecuenciaObservada)):
         if(vectorFrecuenciaObservada[i] != 0):
             cantidadNuevaDeIntervalos += 1
-    gradosLibertad = cantidadNuevaDeIntervalos - 3
+    gradosLibertad = cantidadNuevaDeIntervalos - 1
         
 
     #Esta funcion retorna de forma secuencial lo siguiente:
@@ -152,30 +100,22 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     # ya no existen, por lo tanto, no tienen significado
     #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
     #   gradosLibertad:Grados de libertad que tenemos
-    return vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
+    return vectorIntervalosInicioFin, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
     
 
 
 
 
 def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
-    
     N = len(vectorVariablesAleatorias)
     minimoValor = min(vectorVariablesAleatorias)
     maximoValor = max(vectorVariablesAleatorias)
     diferencia = maximoValor - minimoValor
     anchoIntervalos = (diferencia/cantidadIntervalos) + 0.01
-    acumuladorMedia = 0 
-    #Calculamos la media para la sucesion numerica del vector de variables aleatorias
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorMedia += vectorVariablesAleatorias[i]      
-    media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    frecEsperada = N/cantidadIntervalos
+    while(frecEsperada<5):
+        cantidadIntervalos -= 1
+        frecEsperada = N/cantidadIntervalos
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -193,8 +133,6 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
             continue
         
     
-    
-    
     #Creamos el vector que va a tener las marcas de clase de cada intervalo
     vectorMarcasDeClase = [0] * cantidadIntervalos
     subIndice1 = 0
@@ -203,6 +141,9 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
         vectorMarcasDeClase[subIndice1] = (vectorIntervalosInicioFin[subindice2 + 1] + vectorIntervalosInicioFin[subindice2])/2
         subindice2 += 2
         subIndice1 += 1
+    
+    vectorProbabilidadObservada= [1/(maximoValor-minimoValor)]*cantidadIntervalos
+    
     #Creamos el vector que va a contener la frecuencia observada en cada intervalo
     vectorFrecuenciaObservada = [0] * cantidadIntervalos
     subindice3 = 1
@@ -219,34 +160,35 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
                 subindice4 += 1
     
     
-    #Calculamos la distribucion de densidad y la frecuencia esperada para cada intervalo
-    vectorDistribucionDensidad = [0] * cantidadIntervalos
-    vectorFrecuenciaEsperada = [0] * cantidadIntervalos
-    subindice5 = 1
-    acumuladorPo = 0
-    for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
-        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
-        subindice5 += 2
-        acumuladorPo += vectorDistribucionDensidad[i]
+    #frecuencia esperada para cada intervalo
+    
+    vectorFrecuenciaEsperada = [frecEsperada] * cantidadIntervalos
+    
         
     
     
-    return vectorMarcasDeClase,vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada
     
     
-#vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad()
-#vectorMarcasDeClaseBase,vectorIntervalosInicioFinBase, vectorDistribucionDensidadBase, vectorFrecuenciaObservadaBase, vectorFrecuenciaEsperadaBase = distribucion_DensidadBase()
-
-
-
-            
+    
+    
         
 
+    #Esta funcion retorna de forma secuencial lo siguiente:
+    #   vectorIntervalosInicioFin: Este vector ya esta modificado para la forma de chi cuadrado,
+    # es decir que muchos de los intervalos se agruparon con su adyacente, por lo cual, todas las celdas que esten en 0 son limites
+    # de intervalos que fueron eliminados para formar los nuevos intervalos mas grandes
+    #   vectorIntervalosInicioFin: AL igual que el anterior, este vector ya esta modificado para la forma de chi cuadrado, 
+    # por lo cual algunas de las celdas son 0, siendo estas las pertenecientes a los antiguos intervalos que no superaban una 
+    # distribucion de densidad mayor o igual a 5
+    #   vectorFrecuenciaObservada:Exactamente igual que los dos anteriores
+    #   vectorFrecuenciaEsperada:Igual a los anteriores
+    #   vectorCChiCuadrado:Este vector contiene los valores de c para cada intervalo, los que son 0 son para los intervalos que 
+    # ya no existen, por lo tanto, no tienen significado
+    #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
+    #   gradosLibertad:Grados de libertad que tenemos
+    return vectorMarcasDeClase,vectorIntervalosInicioFin, vectorFrecuenciaObservada, vectorFrecuenciaEsperada, vectorProbabilidadObservada
 
-    
 
 
-
-
+#vectorIntervalosInicioFin, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad(vector,10)
+#vectorMarcasDeClaseBase,vectorIntervalosInicioFinBase, vectorFrecuenciaObservadaBase, vectorFrecuenciaEsperadaBase = distribucion_DensidadBase(vector,10)
