@@ -35,13 +35,14 @@ def generar_datos_Distribucion(Distribution, datosDistribucion):
     
 
     if(Distribution==1):
-        datos_aleatorios = [math.trunc(distribucionPoisson(1/(datosDistribucion['Lambda'])) * 10000) / 10000 for _ in range(datosDistribucion["Numero de muestra"])]
+        datos_aleatorios = [distribucionPoisson((datosDistribucion['Lambda']) )for _ in range(datosDistribucion["Numero de muestra"])]
+        
     elif(Distribution==2):
         datos_aleatorios = [math.trunc(distribucionUniforme(datosDistribucion["Intervalo Inferior"],datosDistribucion["Intervalo Superior"])* 10000)/ 10000 for _ in range(datosDistribucion["Numero de muestra"])]
     elif(Distribution==3):
         datos_aleatorios = [math.trunc(distribucionNormal(datosDistribucion['Media'],datosDistribucion['Desviacion Estandar'])*10000 )/10000 for _ in range(datosDistribucion["Numero de muestra"])]
     elif(Distribution==4):
-        datos_aleatorios = [math.trunc(distribucionExpNegativa(datosDistribucion('Lambda'))*10000)/10000 for _ in range(datosDistribucion["Numero de muestra"])]
+        datos_aleatorios = [math.trunc(distribucionExpNegativa(datosDistribucion['Lambda'])*10000 )/10000 for _ in range(datosDistribucion["Numero de muestra"])]
 
         
         

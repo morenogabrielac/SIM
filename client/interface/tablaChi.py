@@ -6,7 +6,7 @@ class TablaChiCuadrado(QTableWidget):
         
         #Estructura base
         
-        header =  ['Desde', 'Hastas','Frec. Observada','Frec. Esperada','c','C(acu)']
+        header =  ['Desde', 'Hastas','Frec. Observada','Frec. Esperada','c']
         intervalo= int(len(vectorIntervalosInicioFin)/2)
         self.setColumnCount(len(header))
         self.setRowCount(intervalo)

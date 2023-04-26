@@ -7,7 +7,7 @@ class TablaIntervalos(QTableWidget):
         
         #Estructura base
         header = ['Desde', 'Hastas','Marca de Clase','Frec. Observada','P()','Frec. Esperada']
-        intervalo= int(len(vectorIIF_BASE)/2)
+        #intervalo= int(len(vectorIIF_BASE)/2)
         self.setColumnCount(len(header))
         self.setRowCount(intervalo)
         self.setHorizontalHeaderLabels(header)

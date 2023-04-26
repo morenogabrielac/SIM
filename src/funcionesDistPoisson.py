@@ -2,8 +2,6 @@ from cmath import exp, pi
 from logging import root
 import math
 import random
-import decimal
-#import decimal
 
 
 
@@ -15,23 +13,21 @@ import decimal
 #   vector1,vector2,vector3,vector4,vector5,numero1,numero2 = distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos)
 #Para mas especificidad, ver el comentario que esta en el return de la funcion, ahi esta explicada cada devolucion
 def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
-    gradosLibertad = cantidadIntervalos - 3
+    gradosLibertad = cantidadIntervalos - 1
     N = len(vectorVariablesAleatorias)
     minimoValor = min(vectorVariablesAleatorias)
     maximoValor = max(vectorVariablesAleatorias)
     diferencia = maximoValor - minimoValor
-    anchoIntervalos = (diferencia/cantidadIntervalos) + 0.01
+    anchoIntervalos = diferencia/N
     acumuladorMedia = 0 
     #Calculamos la media para la sucesion numerica del vector de variables aleatorias
     for i in range(len(vectorVariablesAleatorias)):
         acumuladorMedia += vectorVariablesAleatorias[i]      
-    media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    media =  acumuladorMedia/N
+    #Calculamos la varianza
+    lambd = media
+    varianza = media ** 2
+    
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -81,8 +77,8 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     subindice5 = 1
     acumuladorPo = 0
     for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
+        
+        vectorDistribucionDensidad[i] = ((lambd**(vectorIntervalosInicioFin[i]))*math.exp(-lambd))/(math.factorial(int(vectorIntervalosInicioFin[i])))
         vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
         subindice5 += 2
         acumuladorPo += vectorDistribucionDensidad[i]
@@ -138,7 +134,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     for i in range(len(vectorFrecuenciaObservada)):
         if(vectorFrecuenciaObservada[i] != 0):
             cantidadNuevaDeIntervalos += 1
-    gradosLibertad = cantidadNuevaDeIntervalos - 3
+    gradosLibertad = cantidadNuevaDeIntervalos - 1
         
 
     #Esta funcion retorna de forma secuencial lo siguiente:
@@ -154,15 +150,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     # ya no existen, por lo tanto, no tienen significado
     #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
     #   gradosLibertad:Grados de libertad que tenemos
-    vectorIntervalosInicioFin = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIntervalosInicioFin))
-    vectorDistribucionDensidad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorDistribucionDensidad))
-    vectorFrecuenciaObservada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaObservada))
-    vectorFrecuenciaEsperada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaEsperada))
-    vectorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorCChiCuadrado))
-   # acumuladorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), acumuladorCChiCuadrado))
-    #gradosLibertad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), gradosLibertad))
-    
-    return vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
+    return vectorIntervalosInicioFin, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
     
 
 
@@ -174,18 +162,14 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
     minimoValor = min(vectorVariablesAleatorias)
     maximoValor = max(vectorVariablesAleatorias)
     diferencia = maximoValor - minimoValor
-    anchoIntervalos = (diferencia/cantidadIntervalos) + 0.01
+    anchoIntervalos = (diferencia/N)
     acumuladorMedia = 0 
     #Calculamos la media para la sucesion numerica del vector de variables aleatorias
     for i in range(len(vectorVariablesAleatorias)):
         acumuladorMedia += vectorVariablesAleatorias[i]      
     media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    lambd = media
+    varianza = media**2
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -235,35 +219,14 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
     subindice5 = 1
     acumuladorPo = 0
     for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
+        
+        vectorDistribucionDensidad[i] = ((lambd**(vectorIntervalosInicioFin[i]))*math.exp(-lambd))/(math.factorial(int(vectorIntervalosInicioFin[i])))
         vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
         subindice5 += 2
         acumuladorPo += vectorDistribucionDensidad[i]
-
-
-    vectorMarcasDeClase = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorMarcasDeClase))
-    vectorIntervalosInicioFin = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIntervalosInicioFin))
-    vectorDistribucionDensidad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorDistribucionDensidad))
-    vectorFrecuenciaObservada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaObservada))
-    vectorFrecuenciaEsperada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaEsperada))
         
     
     
-    return vectorMarcasDeClase,vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada
+    return vectorMarcasDeClase,vectorDistribucionDensidad,vectorIntervalosInicioFin, vectorFrecuenciaObservada, vectorFrecuenciaEsperada
     
     
-#vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad()
-#vectorMarcasDeClaseBase,vectorIntervalosInicioFinBase, vectorDistribucionDensidadBase, vectorFrecuenciaObservadaBase, vectorFrecuenciaEsperadaBase = distribucion_DensidadBase()
-
-
-
-            
-        
-
-
-    
-
-
-
-

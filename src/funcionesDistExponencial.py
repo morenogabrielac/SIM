@@ -2,8 +2,6 @@ from cmath import exp, pi
 from logging import root
 import math
 import random
-import decimal
-#import decimal
 
 
 
@@ -15,7 +13,7 @@ import decimal
 #   vector1,vector2,vector3,vector4,vector5,numero1,numero2 = distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos)
 #Para mas especificidad, ver el comentario que esta en el return de la funcion, ahi esta explicada cada devolucion
 def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
-    gradosLibertad = cantidadIntervalos - 3
+    gradosLibertad = cantidadIntervalos - 2
     N = len(vectorVariablesAleatorias)
     minimoValor = min(vectorVariablesAleatorias)
     maximoValor = max(vectorVariablesAleatorias)
@@ -26,12 +24,9 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     for i in range(len(vectorVariablesAleatorias)):
         acumuladorMedia += vectorVariablesAleatorias[i]      
     media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    #Calculamos lambda
+    lambd = 1/media
+    
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -76,17 +71,19 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     
     
     #Calculamos la distribucion de densidad y la frecuencia esperada para cada intervalo
-    vectorDistribucionDensidad = [0] * cantidadIntervalos
+    vectorDistribucionDensidadcmc = [0] * cantidadIntervalos
+    vectorDistribucionDensidadcPac = [0] * cantidadIntervalos
     vectorFrecuenciaEsperada = [0] * cantidadIntervalos
     subindice5 = 1
     acumuladorPo = 0
-    for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
-        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
-        subindice5 += 2
-        acumuladorPo += vectorDistribucionDensidad[i]
+    for i in range(len(vectorDistribucionDensidadcPac)):
         
+        vectorDistribucionDensidadcPac[i] = (1-math.exp(-lambd*vectorIntervalosInicioFin[subindice5])-(1-math.exp(-lambd*vectorIntervalosInicioFin[subindice5 -1])))
+        vectorDistribucionDensidadcmc[i] = lambd*math.exp(-lambd*vectorMarcasDeClase[i])*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 -1])
+        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidadcPac[i] * N
+        subindice5 += 2
+        acumuladorPo += vectorDistribucionDensidadcPac[i]
+       
     
     #En este loop, lo que hacemos es agrupar con los intervalos adyacentes, aquellos intervalos que tengan una frecuencia esperada menos a 5
     for i in range(len(vectorFrecuenciaEsperada)):
@@ -138,7 +135,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     for i in range(len(vectorFrecuenciaObservada)):
         if(vectorFrecuenciaObservada[i] != 0):
             cantidadNuevaDeIntervalos += 1
-    gradosLibertad = cantidadNuevaDeIntervalos - 3
+    gradosLibertad = cantidadNuevaDeIntervalos - 2
         
 
     #Esta funcion retorna de forma secuencial lo siguiente:
@@ -154,15 +151,7 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     # ya no existen, por lo tanto, no tienen significado
     #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
     #   gradosLibertad:Grados de libertad que tenemos
-    vectorIntervalosInicioFin = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIntervalosInicioFin))
-    vectorDistribucionDensidad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorDistribucionDensidad))
-    vectorFrecuenciaObservada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaObservada))
-    vectorFrecuenciaEsperada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaEsperada))
-    vectorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorCChiCuadrado))
-   # acumuladorCChiCuadrado = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), acumuladorCChiCuadrado))
-    #gradosLibertad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), gradosLibertad))
-    
-    return vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
+    return vectorIntervalosInicioFin,vectorDistribucionDensidadcmc, vectorDistribucionDensidadcPac, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
     
 
 
@@ -180,12 +169,9 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
     for i in range(len(vectorVariablesAleatorias)):
         acumuladorMedia += vectorVariablesAleatorias[i]      
     media = acumuladorMedia/N
-    #Calculamos la varianza, y a su vez, la desviacion estandar
-    acumuladorVarianza = 0
-    for i in range(len(vectorVariablesAleatorias)):
-        acumuladorVarianza += (vectorVariablesAleatorias[i] - media) **2
-    varianza = acumuladorVarianza/(N - 1)
-    desviacionStandard = math.sqrt(varianza)
+    #Calculamos lambda
+    lambd = 1/media
+    
     #Creamos el vector que va a contener el inicio y fin de cada intervalo
     vectorIntervalosInicioFin = [0] * cantidadIntervalos * 2
     for i in range(len(vectorIntervalosInicioFin)):
@@ -230,40 +216,24 @@ def distribucion_DensidadBase(vectorVariablesAleatorias,cantidadIntervalos):
     
     
     #Calculamos la distribucion de densidad y la frecuencia esperada para cada intervalo
-    vectorDistribucionDensidad = [0] * cantidadIntervalos
+    gradosLibertad = cantidadIntervalos - 2
+    vectorDistribucionDensidadcmc = [0] * cantidadIntervalos
+    vectorDistribucionDensidadcPac = [0] * cantidadIntervalos
     vectorFrecuenciaEsperada = [0] * cantidadIntervalos
     subindice5 = 1
     acumuladorPo = 0
-    for i in range(len(vectorDistribucionDensidad)):
-        q = (-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard))**2
-        vectorDistribucionDensidad[i] = ((math.exp(-0.5*((vectorMarcasDeClase[i]-media)/desviacionStandard)**2))/(desviacionStandard*math.sqrt(2*pi)))*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 - 1])
-        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidad[i] * N
+    for i in range(len(vectorDistribucionDensidadcPac)):
+        
+        vectorDistribucionDensidadcPac[i] = (1-math.exp(-lambd*vectorIntervalosInicioFin[subindice5])-(1-math.exp(-lambd*vectorIntervalosInicioFin[subindice5 -1])))
+        vectorDistribucionDensidadcmc[i] = lambd*math.exp(-lambd*vectorMarcasDeClase[i])*(vectorIntervalosInicioFin[subindice5]-vectorIntervalosInicioFin[subindice5 -1])
+        vectorFrecuenciaEsperada[i] = vectorDistribucionDensidadcPac[i] * N
         subindice5 += 2
-        acumuladorPo += vectorDistribucionDensidad[i]
-
-
-    vectorMarcasDeClase = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorMarcasDeClase))
-    vectorIntervalosInicioFin = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorIntervalosInicioFin))
-    vectorDistribucionDensidad = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorDistribucionDensidad))
-    vectorFrecuenciaObservada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaObservada))
-    vectorFrecuenciaEsperada = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vectorFrecuenciaEsperada))
-        
+        acumuladorPo += vectorDistribucionDensidadcPac[i]
     
-    
-    return vectorMarcasDeClase,vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada
-    
-    
-#vectorIntervalosInicioFin, vectorDistribucionDensidad, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad()
-#vectorMarcasDeClaseBase,vectorIntervalosInicioFinBase, vectorDistribucionDensidadBase, vectorFrecuenciaObservadaBase, vectorFrecuenciaEsperadaBase = distribucion_DensidadBase()
-
-
-
-            
-        
-
-
+    return vectorMarcasDeClase,vectorDistribucionDensidadcmc,vectorIntervalosInicioFin, vectorDistribucionDensidadcPac, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,gradosLibertad
     
 
 
-
+#vectorIntervalosInicioFin,vectorDistribucionDensidadcmc, vectorDistribucionDensidadcPac, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad = distribucion_Densidad(vector,10)
+#vectorMarcasDeClaseBase,vectorDistribucionDensidadcmcBase,vectorIntervalosInicioFinBase, vectorDistribucionDensidadcPacBase, vectorFrecuenciaObservadaBase, vectorFrecuenciaEsperadaBase = distribucion_DensidadBase(vector,10)
 
