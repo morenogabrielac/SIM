@@ -1,6 +1,8 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QFont
+from client.interface.graficoPoisson import poissonGrafico
+from client.interface.tablaChiDiscreta import TablaChiCuadradoDiscreta
 from client.interface.tablaDiscreta import TablaDiscreta
 from src.widgets.generadorDatos import generar_datos_Distribucion
 #from client.interface.components.formDatos import  Formulario
@@ -473,12 +475,17 @@ class Graficos_Poisson(QWidget):
     def __init__(self,datosEntrantes):
         super().__init__()
         self.setWindowTitle('Distribucion Poisson')
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 1350, 400)
 
         datosGenerados = generar_datos_Distribucion(1,datosEntrantes)
         valor, fo = analizar_numeros(datosGenerados)
         densidad = poisson_densidad(valor,datosEntrantes['Lambda'])
         fe = calcular_frecuencia_esperada(densidad,datosEntrantes['Numero de muestra'])
+        valor_analizado, frecuencia_esperada_analizada, frecuencia_observada_analizada = analizar_frecuencias(valor, fe, fo)
+        estadistico_c = calcular_estadistico_discreto(frecuencia_esperada_analizada,frecuencia_observada_analizada)
+        cAcumulado = calcular_estadistico_acumulado(estadistico_c)
+        intervalo = len(estadistico_c)
+        pruebaChi = prueba_chi(1,intervalo,cAcumulado)
         
         vectorMC,vectorDistribucionDensidad,vectorIIF_BASE,vectorFO_BASE,vectorFE_BASE = poissonBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
         vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=poisson(datosGenerados,datosEntrantes['Cantidad intervalos'])
@@ -489,11 +496,12 @@ class Graficos_Poisson(QWidget):
 
         tablaGeneral = TablaGeneral(datosGenerados)
         tablaDiscreta = TablaDiscreta(valor,fo,densidad,fe)
-        #graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
+        tablaChiDiscreta =TablaChiCuadradoDiscreta(valor_analizado,frecuencia_esperada_analizada, frecuencia_observada_analizada, estadistico_c)
+        graficoNormal = poissonGrafico(valor,fo)
         #tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
         #pruebaChi = prueba_chi(1,intervalo,acumuladorCChiCuadrado)
                 # Crear los widgets
-        #pruebaChi_label = QLabel(pruebaChi)
+        pruebaChi_label = QLabel(pruebaChi)
 
          
         # Crear el layout
@@ -504,12 +512,13 @@ class Graficos_Poisson(QWidget):
         layout.addWidget(tablaGeneral)
         #layoutTablas.addWidget(tablaAleadorios)
         layoutTablas.addWidget(tablaDiscreta)
-        #layoutTablas.addWidget(tablaChi)
-        layoutTablas.addLayout(layout_texto)
-        #layoutGrafico.addWidget(graficoNormal)
-        #layout_texto.addWidget(pruebaChi_label, 0, 0)        
+        layoutTablas.addWidget(tablaChiDiscreta)
         
-        #layoutTablas.addWidget(tablaChi)
+        
+        layoutTablas.addLayout(layout_texto)
+        layoutGrafico.addWidget(graficoNormal)
+        layout_texto.addWidget(pruebaChi_label, 0, 0)        
+        
         layout.addLayout(layoutTablas)
         layout.addLayout(layoutGrafico)
     
