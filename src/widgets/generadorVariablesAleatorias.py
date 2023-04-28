@@ -70,9 +70,9 @@ def prueba_chi(nro_dist, intervalos, suma):
     for i in tabla_chi:
         if i[0] == grados:
             valor_tabla = i[1]
-            
+        """            
         else:
-            valor_tabla = chi2_critical_value(0.95, grados)
+            valor_tabla = chi2_critical_value(0.95, grados)"""
     
     if suma <= valor_tabla:
         res = f"Dado que el valor de la C(acu):{suma} <= {valor_tabla}  No se puede rechazar la hipotesis"

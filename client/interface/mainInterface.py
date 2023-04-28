@@ -14,8 +14,6 @@ from src.funcionesDistExponencial import distribucion_Densidad as exponencial
 from src.funcionesDistExponencial import distribucion_DensidadBase as exponencialBase
 from src.funcionesDistUniforme import distribucion_Densidad as uniforme
 from src.funcionesDistUniforme import distribucion_DensidadBase as uniformeBase
-from src.funcionesDistPoisson import distribucion_Densidad as poisson
-from src.funcionesDistPoisson import distribucion_DensidadBase as poissonBase
 from src.funcionesDistPoissonv2 import *
 
 from client.interface.grafico import RandomDataHistogram as Grafico
@@ -101,13 +99,20 @@ class Formulario_Normal(QWidget):
         self.media_label = QLabel('Media:')
         self.de_label = QLabel('Desviacion Estandar:')
         self.cant_intervalo_label = QLabel('Cantidad Intervalos:')
-
         self.num_muestra_edit =  QLineEdit()
         self.media_edit = QDoubleSpinBox()
         self.media_edit.setRange(-1000, 1000)
         self.de_edit = QDoubleSpinBox()
         self.de_edit.setRange(-1000, 1000)
         self.cant_intervalo_edit = QLineEdit()
+        
+        #comboBox
+        self.comboBox_label = QLabel('Cantidad Intervalos:')
+        self.comboBox = QComboBox()
+        self.comboBox.addItem('5')
+        self.comboBox.addItem('10')
+        self.comboBox.addItem('12')
+        self.comboBox.addItem('20')
 
         self.guardar_btn = QPushButton('Generar')    
          
@@ -121,8 +126,10 @@ class Formulario_Normal(QWidget):
         layout.addWidget(self.media_edit,1, 1)
         layout.addWidget(self.de_label, 2, 0)
         layout.addWidget(self.de_edit, 2, 1)
-        layout.addWidget(self.cant_intervalo_label, 3, 0)
-        layout.addWidget(self.cant_intervalo_edit, 3, 1)
+        #layout.addWidget(self.cant_intervalo_label, 3, 0)
+        #layout.addWidget(self.cant_intervalo_edit, 3, 1)
+        layout.addWidget(self.comboBox_label, 3, 0)
+        layout.addWidget(self.comboBox, 3, 1)
         layout.addWidget(self.guardar_btn, 4, 0, 1, 2)
 
         self.setLayout(layout)
@@ -133,7 +140,7 @@ class Formulario_Normal(QWidget):
         n = int(self.num_muestra_edit.text())
         media = float(self.media_edit.value())
         desvE = float(self.de_edit.value())
-        cantIntervalos = int(self.cant_intervalo_edit.text())
+        cantIntervalos = int(self.comboBox.currentText())
         
         datos = {
             'Numero de muestra': n,
@@ -156,7 +163,7 @@ class Graficos_Normal(QWidget):
     def __init__(self,datosEntrantes):
         super().__init__()
         self.setWindowTitle('Distribucion Normal')
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 1350, 400)
 
         datosGenerados = generar_datos_Distribucion(3,datosEntrantes)
         vectorMC,vectorIIF_BASE,vectorDistribucionDensidad,vectorFO_BASE,vectorFE_BASE = distribucion_DensidadBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
@@ -224,6 +231,12 @@ class Formulario_Uniforme(QWidget):
         self.intervalo_superior_edit = QLineEdit()
         self.intervalo_inferior_edit = QLineEdit()
         self.cant_intervalo_edit = QLineEdit()
+        self.comboBox_label = QLabel('Cantidad Intervalos:')
+        self.comboBox = QComboBox()
+        self.comboBox.addItem('5')
+        self.comboBox.addItem('10')
+        self.comboBox.addItem('12')
+        self.comboBox.addItem('20')
 
         self.guardar_btn = QPushButton('Generar')
         self.guardar_btn.clicked.connect(self.open_window_uniforme_stats)
@@ -237,8 +250,8 @@ class Formulario_Uniforme(QWidget):
         layout.addWidget(self.intervalo_superior_edit, 2, 1)
         layout.addWidget(self.intervalo_inferior_label, 3, 0)
         layout.addWidget(self.intervalo_inferior_edit, 3, 1)
-        layout.addWidget(self.cant_intervalo_label, 4, 0)
-        layout.addWidget(self.cant_intervalo_edit, 4, 1)
+        layout.addWidget(self.comboBox_label, 4, 0)
+        layout.addWidget(self.comboBox, 4, 1)
         layout.addWidget(self.guardar_btn, 5, 0, 1, 2)
 
         self.setLayout(layout)
@@ -249,7 +262,7 @@ class Formulario_Uniforme(QWidget):
         n = int(self.num_muestra_edit.text())
         a = int(self.intervalo_inferior_edit.text())
         b = int(self.intervalo_superior_edit.text())
-        cantIntervalos = int(self.cant_intervalo_edit.text())
+        cantIntervalos = int(self.comboBox.currentText())
 
         datos = {
             'Numero de muestra': n,
@@ -270,7 +283,7 @@ class Graficos_Uniforme(QWidget):
     def __init__(self,datosEntrantes):
         super().__init__()
         self.setWindowTitle('Distribucion uniforme')
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 1350, 400)
 
         datosGenerados = generar_datos_Distribucion(2,datosEntrantes)
         vectorMC,vectorIIF_BASE,vectorFO_BASE,vectorFE_BASE,vectorDistribucionDensidad = uniformeBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
@@ -340,6 +353,12 @@ class Formulario_Exponencial(QWidget):
         self.num_muestra_edit = QLineEdit()
         self.lambda_edit = QLineEdit()
         self.cant_intervalo_edit = QLineEdit()
+        self.comboBox_label = QLabel('Cantidad Intervalos:')
+        self.comboBox = QComboBox()
+        self.comboBox.addItem('5')
+        self.comboBox.addItem('10')
+        self.comboBox.addItem('12')
+        self.comboBox.addItem('20')
 
         self.guardar_btn = QPushButton('Generar')
         self.guardar_btn.clicked.connect(self.open_window_exponencial_stats)
@@ -350,8 +369,8 @@ class Formulario_Exponencial(QWidget):
         layout.addWidget(self.num_muestra_edit, 0, 1)
         layout.addWidget(self.lambda_label, 1, 0)
         layout.addWidget(self.lambda_edit, 1, 1)
-        layout.addWidget(self.cant_intervalo_label, 2, 0)
-        layout.addWidget(self.cant_intervalo_edit, 2, 1)
+        layout.addWidget(self.comboBox_label, 2, 0)
+        layout.addWidget(self.comboBox, 2, 1)
         layout.addWidget(self.guardar_btn, 3, 0, 1, 2)
 
         self.setLayout(layout)
@@ -359,7 +378,7 @@ class Formulario_Exponencial(QWidget):
     def open_window_exponencial_stats(self):
         n = int(self.num_muestra_edit.text())
         lamb = float(self.lambda_edit.text())
-        cantIntervalos =  int(self.cant_intervalo_edit.text())
+        cantIntervalos =  int(self.comboBox.currentText())
         
         datos = {
             'Numero de muestra': n,
@@ -381,7 +400,7 @@ class Graficos_Exponencial(QWidget):
     def __init__(self,datosEntrantes):
         super().__init__()
         self.setWindowTitle('Distribucion exponencial')
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 1350, 400)
 
         datosGenerados =generar_datos_Distribucion(4,datosEntrantes)
         vectorMC,vector1,vectorIIF_BASE,vectorDistribucionDensidad,vectorFO_BASE,vectorFE_BASE,gradosLibertad = exponencialBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
@@ -389,7 +408,7 @@ class Graficos_Exponencial(QWidget):
         intervalo = int(len(vectorIIF_BASE)/2)
 
          # Crear los widgets
-        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
+        tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,intervalo)
 
         tablaGeneral = TablaGeneral(datosGenerados)
         graficoNormal = Grafico(vectorFO_BASE,vectorMC,intervalo)
@@ -487,20 +506,14 @@ class Graficos_Poisson(QWidget):
         intervalo = len(estadistico_c)
         pruebaChi = prueba_chi(1,intervalo,cAcumulado)
         
-        vectorMC,vectorDistribucionDensidad,vectorIIF_BASE,vectorFO_BASE,vectorFE_BASE = poissonBase(datosGenerados,datosEntrantes['Cantidad intervalos'])
-        vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad=poisson(datosGenerados,datosEntrantes['Cantidad intervalos'])
-        intervalo = int(len(vectorIIF_BASE)/2)
         
-        # Crear los widgets
-        #tablaAleadorios = TablaIntervalos(vectorIIF_BASE,vectorMC,vectorFO_BASE,vectorDistribucionDensidad,vectorFE_BASE,10)
-
+        
+       
         tablaGeneral = TablaGeneral(datosGenerados)
         tablaDiscreta = TablaDiscreta(valor,fo,densidad,fe)
         tablaChiDiscreta =TablaChiCuadradoDiscreta(valor_analizado,frecuencia_esperada_analizada, frecuencia_observada_analizada, estadistico_c)
         graficoNormal = poissonGrafico(valor,fo)
-        #tablaChi = TablaChiCuadrado(vectorIntervalosInicioFin,vectorFrecuenciaObservada,vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado)
-        #pruebaChi = prueba_chi(1,intervalo,acumuladorCChiCuadrado)
-                # Crear los widgets
+       
         pruebaChi_label = QLabel(pruebaChi)
 
          
