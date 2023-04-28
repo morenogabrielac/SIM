@@ -2,6 +2,7 @@ from cmath import exp, pi
 from logging import root
 import math
 import random
+import decimal
 
 
 
@@ -151,6 +152,10 @@ def distribucion_Densidad(vectorVariablesAleatorias,cantidadIntervalos):
     # ya no existen, por lo tanto, no tienen significado
     #   acumuladorCChiCuadrado:Este es el valor que vamos a comparar con la tabla de chi cuadrado
     #   gradosLibertad:Grados de libertad que tenemos
+    vector = list(map(lambda x: decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN), vector))
+   
+
+    
     return vectorIntervalosInicioFin,vectorDistribucionDensidadcmc, vectorDistribucionDensidadcPac, vectorFrecuenciaObservada, vectorFrecuenciaEsperada,vectorCChiCuadrado,acumuladorCChiCuadrado,gradosLibertad
     
 
